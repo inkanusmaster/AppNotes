@@ -24,8 +24,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     protected void newNote() {
-        Intent intent = new Intent(this, Note.class);
-        startActivityForResult(intent, 1);
+        try {
+            Intent intent = new Intent(this, Note.class);
+            startActivityForResult(intent, 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -46,13 +51,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-            if(resultCode == RESULT_OK) {
-                title = data.getStringExtra("Title");
-                noteTitle.add(title);
-                notesListView.setAdapter(arrayAdapter);
+        try {
+            super.onActivityResult(requestCode, resultCode, data);
+            if (requestCode == 1) {
+                if (resultCode == RESULT_OK) {
+                    title = data.getStringExtra("Title");
+                    noteTitle.add(title);
+                    notesListView.setAdapter(arrayAdapter);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

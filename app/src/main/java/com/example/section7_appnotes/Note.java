@@ -22,7 +22,6 @@ public class Note extends AppCompatActivity {
         } catch(Exception e){
             e.printStackTrace();
         }
-
         super.onBackPressed();
     }
 
