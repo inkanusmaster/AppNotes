@@ -3,7 +3,6 @@ package com.example.section7_appnotes;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
-import android.widget.ListView;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,11 +14,13 @@ public class Note extends AppCompatActivity {
     public void onBackPressed() {
         try {
             titleEditText = findViewById(R.id.titleEditText);
+            contentEditText = findViewById(R.id.contentEditText);
             Intent intent = getIntent();
-            intent.putExtra("Title",titleEditText.getText().toString());
-            setResult(RESULT_OK,intent);
+            intent.putExtra("Title", titleEditText.getText().toString());
+            intent.putExtra("Content", contentEditText.getText().toString());
+            setResult(RESULT_OK, intent);
             finish();
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         super.onBackPressed();

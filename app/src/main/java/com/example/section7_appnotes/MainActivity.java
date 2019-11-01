@@ -3,6 +3,7 @@ package com.example.section7_appnotes;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,16 +12,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    boolean firstOpen;
     ListView notesListView;
-    final ArrayList<String> noteTitle = new ArrayList<>();
+    ArrayList<String> noteTitleArrayList = new ArrayList<>();
+    ArrayList<String> noteContentArrayList = new ArrayList<>();
     ArrayAdapter<String> arrayAdapter;
-    protected String title = "";
+    SharedPreferences titleSharedPreferences;
+    SharedPreferences contentSharedPreferences;
 
 
     protected void newNote() {
@@ -30,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -49,14 +49,20 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        String currentTitle, currentContent;
+
         try {
             super.onActivityResult(requestCode, resultCode, data);
             if (requestCode == 1) {
                 if (resultCode == RESULT_OK) {
-                    title = data.getStringExtra("Title");
-                    noteTitle.add(title);
+                    currentTitle = data.getStringExtra("Title");
+                    currentContent = data.getStringExtra("Content");
+                    noteTitleArrayList.add(currentTitle);
+                    noteContentArrayList.add(currentContent);
+//                    titleSharedPreferences.edit().putString(String.valueOf(noteTitleArrayList.indexOf(currentTitle)), currentTitle).apply();
+//                    contentSharedPreferences.edit().putString(String.valueOf(noteContentArrayList.indexOf(currentContent)), currentContent).apply();
+
                     notesListView.setAdapter(arrayAdapter);
                 }
             }
@@ -68,13 +74,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        firstOpen = true;
+        titleSharedPreferences = this.getSharedPreferences("com.example.section7_appnotes", MODE_PRIVATE);
+        contentSharedPreferences = this.getSharedPreferences("com.example.section7_appnotes", MODE_PRIVATE);
         notesListView = findViewById(R.id.notesListView);
-        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, noteTitle);
-        notesListView.setAdapter(arrayAdapter);
+        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, noteTitleArrayList);
         notesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String title = titleSharedPreferences.getString(String.valueOf(i), "");
+                String content = contentSharedPreferences.getString(String.valueOf(i), "");
+                System.out.println("TITLE\n" + title + "\n");
+                System.out.println("CONTENT\n" + content + "\n");
+
             }
         });
     }
