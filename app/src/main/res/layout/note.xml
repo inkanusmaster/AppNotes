@@ -26,5 +26,6 @@
         android:inputType="textMultiLine"
         android:singleLine="false"
         android:textAlignment="viewStart"
+        android:lines="100"
         tools:ignore="Autofill,LabelFor" />
 </LinearLayout>

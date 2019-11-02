@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> arrayAdapter;
     SharedPreferences titleSharedPreferences;
     SharedPreferences contentSharedPreferences;
-
+    ArrayList<String> newTitleArrayList;
+    ArrayList<String> newContentArrayList;
 
     protected void newNote() {
         try {
@@ -60,9 +63,8 @@ public class MainActivity extends AppCompatActivity {
                     currentContent = data.getStringExtra("Content");
                     noteTitleArrayList.add(currentTitle);
                     noteContentArrayList.add(currentContent);
-//                    titleSharedPreferences.edit().putString(String.valueOf(noteTitleArrayList.indexOf(currentTitle)), currentTitle).apply();
-//                    contentSharedPreferences.edit().putString(String.valueOf(noteContentArrayList.indexOf(currentContent)), currentContent).apply();
-
+                    contentSharedPreferences.edit().putString(String.valueOf(noteContentArrayList.indexOf(currentContent)), ObjectSerializer.serialize(noteContentArrayList)).apply();
+                    titleSharedPreferences.edit().putString(String.valueOf(noteTitleArrayList.indexOf(currentTitle)), ObjectSerializer.serialize(noteTitleArrayList)).apply();
                     notesListView.setAdapter(arrayAdapter);
                 }
             }
@@ -74,17 +76,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        titleSharedPreferences = this.getSharedPreferences("com.example.section7_appnotes", MODE_PRIVATE);
-        contentSharedPreferences = this.getSharedPreferences("com.example.section7_appnotes", MODE_PRIVATE);
+        contentSharedPreferences = this.getSharedPreferences("content", MODE_PRIVATE);
+        titleSharedPreferences = this.getSharedPreferences("title", MODE_PRIVATE);
+        System.out.println("TITLES"+newTitleArrayList+"\n");
+        System.out.println("CONTENTS"+newContentArrayList+"\n");
+
         notesListView = findViewById(R.id.notesListView);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, noteTitleArrayList);
+        notesListView.setAdapter(arrayAdapter);
         notesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String title = titleSharedPreferences.getString(String.valueOf(i), "");
-                String content = contentSharedPreferences.getString(String.valueOf(i), "");
-                System.out.println("TITLE\n" + title + "\n");
-                System.out.println("CONTENT\n" + content + "\n");
+                newTitleArrayList = new ArrayList<>();
+                newContentArrayList = new ArrayList<>();
+                try {
+                    newTitleArrayList = (ArrayList<String>) ObjectSerializer.deserialize(titleSharedPreferences.getString(String.valueOf(i), ObjectSerializer.serialize(new ArrayList<String>())));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    newContentArrayList = (ArrayList<String>) ObjectSerializer.deserialize(contentSharedPreferences.getString(String.valueOf(i), ObjectSerializer.serialize(new ArrayList<String>())));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+//                String title = titleSharedPreferences.getString(String.valueOf(i), "");
+//                String content = contentSharedPreferences.getString(String.valueOf(i), "");
+                System.out.println("VALUE OF I " + i + "\n");
+                assert newTitleArrayList != null;
+                System.out.println("TITLE\n" + newTitleArrayList.get(i) + "\n");
+                assert newContentArrayList != null;
+                System.out.println("CONTENT\n" + newContentArrayList.get(i) + "\n");
 
             }
         });
